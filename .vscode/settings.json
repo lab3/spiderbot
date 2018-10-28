@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.env.osx": {
+        "PATH": "/Users/len/.platformio/penv/bin:/Users/len/.platformio/penv:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/opt/local/bin:/opt/local/sbin",
+        "PLATFORMIO_CALLER": "vscode"
+    }
+}
