@@ -8,6 +8,9 @@ class Servo_Control
   public:
     Servo_Control();
     void begin(void);
+    void sweep(void);
+    void setPWM(uint8_t num, uint16_t on, uint16_t off);
+    void step(uint8_t leg);
 
   private:
     Adafruit_PWMServoDriver _pwm;
