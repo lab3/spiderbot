@@ -29,7 +29,7 @@ short degreesPerSecondLimit = 22;
 long elapsedTimeMicros = 0;
 long lastTime = -1;
 
-short leg1Pos = SERVO_CENTER;
+double leg1Pos = SERVO_CENTER;
 bool leg1Moving = false;
 bool leg1Forward = true;
 
@@ -55,28 +55,26 @@ void Servo_Control::step(uint8_t leg)
   if (leg1Forward)
   {
     double degreesToMove = elapsedTimeMicros * DEGREES_PER_MICRO_LIMIT;
+    double deltaPulseLen = degreesToMove / DEGREES_PER_PULSE;
 
-    Serial.print("degreesToMove: ");
-    Serial.println(degreesToMove);
+    // Serial.print("degreesToMove: ");
+    // Serial.println(degreesToMove);
+    // Serial.print("elapsedTimeMicros: ");
+    // Serial.println(elapsedTimeMicros);
 
-    Serial.print("elapsedTimeMicros: ");
-    Serial.println(elapsedTimeMicros);
-
-    double delta = degreesToMove / DEGREES_PER_PULSE;
-
-    if (delta > MAX_PULSE_DELTA)
+    if (deltaPulseLen > MAX_PULSE_DELTA)
     {
-      delta = MAX_PULSE_DELTA;
+      deltaPulseLen = MAX_PULSE_DELTA;
     }
 
-    if (delta + leg1Pos > SERVO_MAX)
+    if (deltaPulseLen + leg1Pos > SERVO_MAX)
     {
-      delta = SERVO_MAX - leg1Pos;
+      deltaPulseLen = SERVO_MAX - leg1Pos;
     }
 
-    if (delta)
+    if (deltaPulseLen > 0)
     {
-      leg1Pos += delta;
+      leg1Pos += deltaPulseLen;
       _pwm.setPWM(LEG_1, 0, leg1Pos);
     }
 

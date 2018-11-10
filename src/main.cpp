@@ -25,6 +25,7 @@ void setup()
   Serial.println("Spiderbot starting.");
   delay(2000);
   servo.begin();
+  delay(10);
 }
 
 void loop()
