@@ -22,15 +22,17 @@ Servo_Control servo = Servo_Control();
 void setup()
 {
   Serial.begin(9600);
-  Serial.println("Spiderbot starting");
+  Serial.println("Spiderbot starting.");
+  delay(2000);
   servo.begin();
 }
 
 void loop()
 {
-  delay(1);
-  
+  servo.step(0);
+
   //servo.sweep();
+
 }
 
 void p(char *fmt, ...)
