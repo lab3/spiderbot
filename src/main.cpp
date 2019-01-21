@@ -2,7 +2,8 @@
 #include <stdarg.h>
 #include <PID_v1.h>
 #include "Servo_Control/Servo_Control.h"
-
+#include "Calibration/Calibration.h"
+#include "MemoryFree.h"
 
 //unsigned long last = micros();
 //unsigned long cur = last;
@@ -18,6 +19,7 @@
 //PID myPID(&Input, &Output, &Setpoint, consKp, consKi, consKd, DIRECT);
 
 Servo_Control servo = Servo_Control();
+Servo_Calibration calibration;
 
 void setup()
 {
@@ -30,18 +32,10 @@ void setup()
 
 void loop()
 {
-  servo.step(0);
+  // Serial.print("freeMemory()=");
+  // Serial.println(freeMemory());
+  calibration.TryCalibrate(&servo);
+  //servo.step(0);
 
   //servo.sweep();
-
-}
-
-void p(char *fmt, ...)
-{
-  char buf[128]; // resulting string limited to 128 chars
-  va_list args;
-  va_start(args, fmt);
-  vsnprintf(buf, 128, fmt, args);
-  va_end(args);
-  Serial.print(buf);
 }

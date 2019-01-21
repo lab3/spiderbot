@@ -10,6 +10,7 @@ public:
   void begin(void);
   void sweep(void);
   void setPWM(uint8_t num, uint16_t on, uint16_t off);
+  void setServo(uint8_t num, uint16_t pos);
   void step(uint8_t leg);
 
 private:
