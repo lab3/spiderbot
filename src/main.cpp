@@ -39,6 +39,29 @@ void button_pressed()
   }
 }
 
+void handle_running_change()
+{
+  if (running)
+  {
+    if (!servos_initialized)
+    {
+      servo.init();
+      servos_initialized = true;
+    }
+
+    if (!servos_started)
+    {
+      servo.start();
+      servos_started = true;
+    }
+  }
+  else
+  {
+    servos_started = false;
+    servo.stop();
+  }
+}
+
 void setup()
 {
   Serial.begin(9600);
@@ -54,24 +77,12 @@ void setup()
 
 void loop()
 {
+  handle_running_change();
+
   if (running)
   {
-    if (!servos_initialized)
-    {
-      servo.init();
-      servos_initialized = true;
-    }
-
-    if (!servos_started)
-    {
-      servo.start();
-      servos_started = true;
-    }
     calibration.TryCalibrate(&servo);
   }
-  else
-  {
-    servos_started = false;
-    servo.stop();
-  }
 }
+
+
