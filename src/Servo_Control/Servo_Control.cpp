@@ -9,19 +9,25 @@
 
 //Base servo config: TowerPro MG90s
 #define MOVEMENT_REDUCTION 30
-#define SERVO_MIN 170+MOVEMENT_REDUCTION    //150 // this is the 'minimum' pulse length count (out of 4096)
-#define SERVO_MAX 440-MOVEMENT_REDUCTION    //600 // this is the 'maximum' pulse length count (out of 4096)
-#define SERVO_CENTER 305 //375 //((SERVOMAX - SERVOMIN) / 2) + SERVOMIN
+#define SERVO_MIN 170 + MOVEMENT_REDUCTION //150 // this is the 'minimum' pulse length count (out of 4096)
+#define SERVO_MAX 440 - MOVEMENT_REDUCTION //600 // this is the 'maximum' pulse length count (out of 4096)
+#define SERVO_CENTER 305                   //375 //((SERVOMAX - SERVOMIN) / 2) + SERVOMIN
 #define SERVO_FREQ 50
 #define SERVO_DEGREES 165
+#define MAX_ITEMS 16
 
+//These indexes map to pins on the
 //outer, mid, inner, not used
-int servo_offsets[] = {
-  311, 308, 293, 0, //leg 1, front right
-  313, 296, 328, 0, //leg 2, front left
-  335, 317, 325, 0, //leg 3, rear left
-  327, 309, 322, 0  //leg 4, rear right
+
+int servo_centers[] = {
+    311, 308, 293, 0, //leg 1, front right
+    313, 296, 328, 0, //leg 2, front left
+    335, 317, 325, 0, //leg 3, rear left
+    327, 309, 322, 0  //leg 4, rear right
 };
+
+int current_positions[16];
+int target_positions[16];
 
 //Movement tracking
 #define MICROS_PER_SECOND 1000000
@@ -42,7 +48,16 @@ bool leg1Forward = true;
 
 Servo_Control::Servo_Control()
 {
-  //Serial.println("Servo_Control::Servo_Control()");
+  for (int i = 0; i < MAX_ITEMS; i++)
+  {
+    current_positions[i] = servo_centers[i];
+  }
+}
+
+void Servo_Control::moveServoToPos(uint8_t servoIndex, uint16_t pos)
+{
+  if (pos < SERVO_MIN || pos > SERVO_MAX)
+    return;
 }
 
 void Servo_Control::step(uint8_t leg)
@@ -118,7 +133,7 @@ void Servo_Control::step(uint8_t leg)
   lastTime = currentMicros;
 }
 
-void Servo_Control::begin(void)
+void Servo_Control::init(void)
 {
   //Serial.println("Servo_Control::begin()");
 
@@ -129,18 +144,27 @@ void Servo_Control::begin(void)
 
   for (size_t i = 0; i < 16; i++)
   {
-    _pwm.setPWM(i, 0, servo_offsets[i]);
+    _pwm.setPWM(i, 0, servo_centers[i]);
   }
 
   //enable power to the servo board by engaging the relay
   pinMode(PIND3, OUTPUT);
-  digitalWrite(PIND3, HIGH);
 
   // wired to the OE of the servo board
   // pinMode(PIND2, OUTPUT);
   // digitalWrite(PIND2, LOW);
 
   //Serial.println("Servo_Control::begin() end");
+}
+
+void Servo_Control::stop(void)
+{
+  digitalWrite(PIND3, LOW);
+}
+
+void Servo_Control::start(void)
+{
+  digitalWrite(PIND3, HIGH);
 }
 
 void Servo_Control::setPWM(uint8_t num, uint16_t on, uint16_t off)

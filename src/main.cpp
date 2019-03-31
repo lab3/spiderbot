@@ -21,21 +21,57 @@
 Servo_Control servo = Servo_Control();
 Servo_Calibration calibration;
 
+bool running = false;
+bool servos_initialized = false;
+bool servos_started = false;
+unsigned long button_debounce = millis();
+unsigned long button_last = millis();
+
+void button_pressed()
+{
+  button_debounce = millis();
+
+  if (button_debounce - button_last > 1000)
+  {
+    Serial.println("button");
+    running = !running;
+    button_last = millis();
+  }
+}
+
 void setup()
 {
   Serial.begin(9600);
   Serial.println("Spiderbot starting.");
+
+  pinMode(PIN2, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PIN2), button_pressed, FALLING);
+
   delay(2000);
-  servo.begin();
+  //servo.begin();
   delay(10);
 }
 
 void loop()
 {
-  // Serial.print("freeMemory()=");
-  // Serial.println(freeMemory());
-  calibration.TryCalibrate(&servo);
-  //servo.step(0);
+  if (running)
+  {
+    if (!servos_initialized)
+    {
+      servo.init();
+      servos_initialized = true;
+    }
 
-  //servo.sweep();
+    if (!servos_started)
+    {
+      servo.start();
+      servos_started = true;
+    }
+    calibration.TryCalibrate(&servo);
+  }
+  else
+  {
+    servos_started = false;
+    servo.stop();
+  }
 }

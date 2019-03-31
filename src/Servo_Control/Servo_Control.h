@@ -7,14 +7,18 @@ class Servo_Control
 {
 public:
   Servo_Control();
-  void begin(void);
+  void init(void);
+  void start(void);
+  void stop(void);
   void sweep(void);
   void setPWM(uint8_t num, uint16_t on, uint16_t off);
   void setServo(uint8_t num, uint16_t pos);
+  void moveServoToPos(uint8_t servoIndex, uint16_t pos);
   void step(uint8_t leg);
 
 private:
   Adafruit_PWMServoDriver _pwm;
+
   // called this way, it uses the default address 0x40
   // you can also call it with a different address you want
   //Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x41);
