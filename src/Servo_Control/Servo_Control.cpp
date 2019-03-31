@@ -50,14 +50,12 @@ Servo_Control::Servo_Control()
 {
   for (int i = 0; i < MAX_ITEMS; i++)
   {
-    current_positions[i] = servo_centers[i];
+    current_positions[i] = target_positions[i] = servo_centers[i];
   }
 }
 
-void Servo_Control::moveServoToPos(uint8_t servoIndex, uint16_t pos)
+void Servo_Control::moveToTargets()
 {
-  if (pos < SERVO_MIN || pos > SERVO_MAX)
-    return;
 }
 
 void Servo_Control::step(uint8_t leg)
@@ -167,12 +165,13 @@ void Servo_Control::start(void)
   digitalWrite(PIND3, HIGH);
 }
 
+//This should not really be used for servos
 void Servo_Control::setPWM(uint8_t num, uint16_t on, uint16_t off)
 {
   _pwm.setPWM(num, on, off);
 }
 
-void Servo_Control::setServo(uint8_t num, uint16_t pos)
+void Servo_Control::setServoPos(uint8_t num, uint16_t pos)
 {
   _pwm.setPWM(num, 0, pos);
 }

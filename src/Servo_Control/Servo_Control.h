@@ -12,8 +12,9 @@ public:
   void stop(void);
   void sweep(void);
   void setPWM(uint8_t num, uint16_t on, uint16_t off);
-  void setServo(uint8_t num, uint16_t pos);
-  void moveServoToPos(uint8_t servoIndex, uint16_t pos);
+  void setServoPos(uint8_t num, uint16_t pos);
+  void setServoTargetPos(uint8_t num, uint16_t pos);
+  void moveToTargets();
   void step(uint8_t leg);
 
 private:

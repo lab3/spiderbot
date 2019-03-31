@@ -28,7 +28,7 @@ void Servo_Calibration::InitServos(Servo_Control *servo_control)
 
     for (int i = 0; i < 16; i++)
     {
-        servo_control->setServo(i, SERVO_CENTER);
+        servo_control->setServoPos(i, SERVO_CENTER);
     }
 }
 
@@ -99,7 +99,7 @@ void Servo_Calibration::RunCalibration(Servo_Control *servo_control)
                 Serial.print("invalid input");
             }
 
-            servo_control->setServo(servoIndex, servoPositions[servoIndex]);
+            servo_control->setServoPos(servoIndex, servoPositions[servoIndex]);
         }
     }
 
