@@ -5,19 +5,6 @@
 #include "Calibration/Calibration.h"
 #include "MemoryFree.h"
 
-//unsigned long last = micros();
-//unsigned long cur = last;
-
-//Define Variables we'll be connecting to
-//double Setpoint, Input, Output;
-
-//Define the aggressive and conservative Tuning Parameters
-//double aggKp = 4, aggKi = 0.2, aggKd = 1;
-//double consKp = 1, consKi = 0.05, consKd = 0.25;
-
-//Specify the links and initial tuning parameters
-//PID myPID(&Input, &Output, &Setpoint, consKp, consKi, consKd, DIRECT);
-
 Servo_Control servo = Servo_Control();
 Servo_Calibration calibration;
 
@@ -33,7 +20,7 @@ void button_pressed()
 
   if (button_debounce - button_last > 1000)
   {
-    Serial.println("button");
+    Serial.println("button_pressed");
     running = !running;
     button_last = millis();
   }
@@ -53,6 +40,21 @@ void handle_running_change()
     {
       servo.start();
       servos_started = true;
+
+      //TODO: remove that after testing
+      servo.setServoTargetPos(0 + 0, 400);
+      servo.setServoTargetPos(0 + 4, 400);
+      servo.setServoTargetPos(0 + 8, 400);
+      servo.setServoTargetPos(0 + 12, 400);
+      servo.setServoTargetPos(1 + 0, 400);
+      servo.setServoTargetPos(1 + 4, 400);
+      servo.setServoTargetPos(1 + 8, 400);
+      servo.setServoTargetPos(1 + 12, 400);
+      servo.setServoTargetPos(2 + 0, 400);
+      servo.setServoTargetPos(2 + 4, 400);
+      servo.setServoTargetPos(2 + 8, 400);
+      servo.setServoTargetPos(2 + 12, 400);
+
     }
   }
   else
@@ -60,6 +62,22 @@ void handle_running_change()
     servos_started = false;
     servo.stop();
   }
+}
+
+void nextMove()
+{
+  servo.setServoTargetPos(0 + 0, 200);
+  servo.setServoTargetPos(0 + 4, 200);
+  servo.setServoTargetPos(0 + 8, 200);
+  servo.setServoTargetPos(0 + 12, 200);
+  servo.setServoTargetPos(1 + 0, 200);
+  servo.setServoTargetPos(1 + 4, 200);
+  servo.setServoTargetPos(1 + 8, 200);
+  servo.setServoTargetPos(1 + 12, 200);
+  servo.setServoTargetPos(2 + 0, 200);
+  servo.setServoTargetPos(2 + 4, 200);
+  servo.setServoTargetPos(2 + 8, 200);
+  servo.setServoTargetPos(2 + 12, 200);
 }
 
 void setup()
@@ -70,9 +88,10 @@ void setup()
   pinMode(PIN2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(PIN2), button_pressed, FALLING);
 
-  delay(2000);
+  //This is now triggered by button push
+  //delay(2000);
   //servo.begin();
-  delay(10);
+  //delay(10);
 }
 
 void loop()
@@ -81,8 +100,10 @@ void loop()
 
   if (running)
   {
+    if (servo.moveToTargets())
+    {
+      nextMove();
+    }
     calibration.TryCalibrate(&servo);
   }
 }
-
-

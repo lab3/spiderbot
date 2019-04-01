@@ -10,12 +10,10 @@ public:
   void init(void);
   void start(void);
   void stop(void);
-  void sweep(void);
   void setPWM(uint8_t num, uint16_t on, uint16_t off);
   void setServoPos(uint8_t num, uint16_t pos);
   void setServoTargetPos(uint8_t num, uint16_t pos);
-  void moveToTargets();
-  void step(uint8_t leg);
+  bool moveToTargets();
 
 private:
   Adafruit_PWMServoDriver _pwm;

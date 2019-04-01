@@ -18,7 +18,7 @@
 
 //These indexes map to pins on the
 //outer, mid, inner, not used
-
+//fill this array up with the values resulting from the calibration
 int servo_centers[] = {
     311, 308, 293, 0, //leg 1, front right
     313, 296, 328, 0, //leg 2, front left
@@ -26,21 +26,19 @@ int servo_centers[] = {
     327, 309, 322, 0  //leg 4, rear right
 };
 
-int current_positions[16];
+double current_positions[16];
 int target_positions[16];
 
 //Movement tracking
 #define MICROS_PER_SECOND 1000000
-#define DELTA_PER_MICRO
-#define MAX_PULSE_DELTA 10
+#define MAX_PULSE_DELTA 5
 #define DEGREES_PER_PULSE 0.61111111
-//#define DEGREES_PER_MICRO_LIMIT 0.000022
 #define DEGREES_PER_MICRO_LIMIT 0.000032
-
+//#define DEGREES_PER_MICRO_LIMIT 0.000564
 #define LEG_1 0
 
-long elapsedTimeMicros = 0;
-long lastTime = -1;
+long elapsedMicros = 0;
+long lastMicros = -1;
 
 double leg1Pos = SERVO_CENTER;
 bool leg1Moving = false;
@@ -50,91 +48,12 @@ Servo_Control::Servo_Control()
 {
   for (int i = 0; i < MAX_ITEMS; i++)
   {
-    current_positions[i] = target_positions[i] = servo_centers[i];
+    target_positions[i] = current_positions[i] = servo_centers[i];
   }
-}
-
-void Servo_Control::moveToTargets()
-{
-}
-
-void Servo_Control::step(uint8_t leg)
-{
-  unsigned long currentMicros = micros();
-
-  if (!leg1Moving && leg1Pos != SERVO_MAX)
-  {
-    //offset so we actually get some movement on this pass
-    lastTime = micros() - 1000;
-    leg1Moving = true;
-    leg1Forward = true;
-  }
-
-  //calculate the amount to move forward
-  elapsedTimeMicros = currentMicros - lastTime;
-  double degreesToMove = elapsedTimeMicros * DEGREES_PER_MICRO_LIMIT;
-  double deltaPulseLen = degreesToMove / DEGREES_PER_PULSE;
-
-  if (leg1Forward)
-  {
-
-    // Serial.print("degreesToMove: ");
-    // Serial.println(degreesToMove);
-    // Serial.print("elapsedTimeMicros: ");
-    // Serial.println(elapsedTimeMicros);
-
-    if (deltaPulseLen > MAX_PULSE_DELTA)
-    {
-      deltaPulseLen = MAX_PULSE_DELTA;
-    }
-
-    if (deltaPulseLen + leg1Pos > SERVO_MAX)
-    {
-      deltaPulseLen = SERVO_MAX - leg1Pos;
-    }
-
-    if (deltaPulseLen > 0)
-    {
-      leg1Pos += deltaPulseLen;
-      _pwm.setPWM(LEG_1, 0, leg1Pos);
-    }
-
-    if (leg1Pos == SERVO_MAX)
-    {
-      leg1Forward = false;
-    }
-  }
-  else
-  {
-    if (deltaPulseLen > MAX_PULSE_DELTA)
-    {
-      deltaPulseLen = MAX_PULSE_DELTA;
-    }
-
-    if (leg1Pos - deltaPulseLen < SERVO_MIN)
-    {
-      deltaPulseLen = leg1Pos - SERVO_MIN;
-    }
-
-    if (deltaPulseLen > 0)
-    {
-      leg1Pos -= deltaPulseLen;
-      _pwm.setPWM(LEG_1, 0, leg1Pos);
-    }
-
-    if (leg1Pos == SERVO_MIN)
-    {
-      leg1Forward = true;
-    }
-  }
-
-  lastTime = currentMicros;
 }
 
 void Servo_Control::init(void)
 {
-  //Serial.println("Servo_Control::begin()");
-
   //initialze and center all servos
   _pwm = Adafruit_PWMServoDriver();
   _pwm.begin();
@@ -151,8 +70,6 @@ void Servo_Control::init(void)
   // wired to the OE of the servo board
   // pinMode(PIND2, OUTPUT);
   // digitalWrite(PIND2, LOW);
-
-  //Serial.println("Servo_Control::begin() end");
 }
 
 void Servo_Control::stop(void)
@@ -163,6 +80,53 @@ void Servo_Control::stop(void)
 void Servo_Control::start(void)
 {
   digitalWrite(PIND3, HIGH);
+}
+
+bool Servo_Control::moveToTargets()
+{
+  unsigned long currentMicros = micros();
+  elapsedMicros = currentMicros - lastMicros;
+  int mod = 1;
+  bool moveComplete = true;
+
+  for (int i = 0; i < MAX_ITEMS; i++)
+  {
+    if (current_positions[i] != target_positions[i])
+    {
+      moveComplete = false;
+      // Serial.print(elapsedMicros);
+      // Serial.print("\t");
+      // Serial.print(i);
+      // Serial.print("\t");
+      // Serial.println(current_positions[i]);
+
+      double deltaPulses = 0;
+      if (current_positions[i] < target_positions[i])
+      {
+        deltaPulses = target_positions[i] - current_positions[i];
+        mod = 1;
+      }
+      else if (current_positions[i] > target_positions[i])
+      {
+        deltaPulses = current_positions[i] - target_positions[i];
+        mod = -1;
+      }
+
+      double degreesToMove = DEGREES_PER_PULSE * deltaPulses;
+      double maxDegreestoMove = DEGREES_PER_MICRO_LIMIT * elapsedMicros;
+
+      if (degreesToMove > maxDegreestoMove)
+      {
+        degreesToMove = maxDegreestoMove;
+      }
+
+      current_positions[i] += degreesToMove * mod;
+      setServoPos(i, current_positions[i]);
+    }
+  }
+
+  lastMicros = currentMicros;
+  return moveComplete;
 }
 
 //This should not really be used for servos
@@ -176,37 +140,10 @@ void Servo_Control::setServoPos(uint8_t num, uint16_t pos)
   _pwm.setPWM(num, 0, pos);
 }
 
-void Servo_Control::sweep(void)
+void Servo_Control::setServoTargetPos(uint8_t num, uint16_t pos)
 {
-
-  //Drive each servo one at a time
-  delay(1000);
-  Serial.println("min");
-
-  for (uint16_t pulselen = SERVO_MIN; pulselen < SERVO_MAX; pulselen++)
+  if (num >= 0 && num < MAX_ITEMS && pos >= SERVO_MIN && pos <= SERVO_MAX)
   {
-    _pwm.setPWM(0, 0, pulselen);
-
-    if (pulselen == SERVO_CENTER)
-    {
-      delay(1000);
-    }
-
-    delay(1);
-  }
-
-  Serial.println("max");
-  delay(1000);
-
-  for (uint16_t pulselen = SERVO_MAX; pulselen > SERVO_MIN; pulselen--)
-  {
-    _pwm.setPWM(0, 0, pulselen);
-
-    if (pulselen == SERVO_CENTER)
-    {
-      delay(1000);
-    }
-
-    delay(1);
+    target_positions[num] = pos;
   }
 }
