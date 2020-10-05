@@ -42,19 +42,18 @@ void handle_running_change()
       servos_started = true;
 
       //TODO: remove that after testing
-      servo.setServoTargetPos(0 + 0, 400);
-      servo.setServoTargetPos(0 + 4, 400);
-      servo.setServoTargetPos(0 + 8, 400);
-      servo.setServoTargetPos(0 + 12, 400);
-      servo.setServoTargetPos(1 + 0, 400);
-      servo.setServoTargetPos(1 + 4, 400);
-      servo.setServoTargetPos(1 + 8, 400);
-      servo.setServoTargetPos(1 + 12, 400);
-      servo.setServoTargetPos(2 + 0, 400);
-      servo.setServoTargetPos(2 + 4, 400);
-      servo.setServoTargetPos(2 + 8, 400);
-      servo.setServoTargetPos(2 + 12, 400);
-
+      // servo.setServoTargetPos(0 + 0, 400);
+      // servo.setServoTargetPos(0 + 4, 400);
+      // servo.setServoTargetPos(0 + 8, 400);
+      // servo.setServoTargetPos(0 + 12, 400);
+      // servo.setServoTargetPos(1 + 0, 400);
+      // servo.setServoTargetPos(1 + 4, 400);
+      // servo.setServoTargetPos(1 + 8, 400);
+      // servo.setServoTargetPos(1 + 12, 400);
+      // servo.setServoTargetPos(2 + 0, 400);
+      // servo.setServoTargetPos(2 + 4, 400);
+      // servo.setServoTargetPos(2 + 8, 400);
+      // servo.setServoTargetPos(2 + 12, 400);
     }
   }
   else
@@ -66,18 +65,18 @@ void handle_running_change()
 
 void nextMove()
 {
-  servo.setServoTargetPos(0 + 0, 200);
-  servo.setServoTargetPos(0 + 4, 200);
-  servo.setServoTargetPos(0 + 8, 200);
-  servo.setServoTargetPos(0 + 12, 200);
-  servo.setServoTargetPos(1 + 0, 200);
-  servo.setServoTargetPos(1 + 4, 200);
-  servo.setServoTargetPos(1 + 8, 200);
-  servo.setServoTargetPos(1 + 12, 200);
-  servo.setServoTargetPos(2 + 0, 200);
-  servo.setServoTargetPos(2 + 4, 200);
-  servo.setServoTargetPos(2 + 8, 200);
-  servo.setServoTargetPos(2 + 12, 200);
+  // servo.setServoTargetPos(0 + 0, 200);
+  // servo.setServoTargetPos(0 + 4, 200);
+  // servo.setServoTargetPos(0 + 8, 200);
+  // servo.setServoTargetPos(0 + 12, 200);
+  // servo.setServoTargetPos(1 + 0, 200);
+  // servo.setServoTargetPos(1 + 4, 200);
+  // servo.setServoTargetPos(1 + 8, 200);
+  // servo.setServoTargetPos(1 + 12, 200);
+  // servo.setServoTargetPos(2 + 0, 200);
+  // servo.setServoTargetPos(2 + 4, 200);
+  // servo.setServoTargetPos(2 + 8, 200);
+  // servo.setServoTargetPos(2 + 12, 200);
 }
 
 void setup()
@@ -85,13 +84,8 @@ void setup()
   Serial.begin(9600);
   Serial.println("Spiderbot starting.");
 
-  pinMode(PIN2, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(PIN2), button_pressed, FALLING);
-
-  //This is now triggered by button push
-  //delay(2000);
-  //servo.begin();
-  //delay(10);
+  pinMode(PIND7, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PIND7), button_pressed, FALLING);
 }
 
 void loop()
@@ -104,6 +98,7 @@ void loop()
     {
       nextMove();
     }
+
     calibration.TryCalibrate(&servo);
   }
 }

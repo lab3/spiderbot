@@ -37,6 +37,10 @@ int target_positions[16];
 //#define DEGREES_PER_MICRO_LIMIT 0.000564
 #define LEG_1 0
 
+#define ENABLE_RELAY_PIN PIN_A8
+#define SERVO_OE_PIN PIND4
+
+
 long elapsedMicros = 0;
 long lastMicros = -1;
 
@@ -65,21 +69,22 @@ void Servo_Control::init(void)
   }
 
   //enable power to the servo board by engaging the relay
-  pinMode(PIND3, OUTPUT);
+  pinMode(ENABLE_RELAY_PIN, OUTPUT);
 
   // wired to the OE of the servo board
-  // pinMode(PIND2, OUTPUT);
-  // digitalWrite(PIND2, LOW);
+  //TODO: should this go to ground directly??
+  pinMode(SERVO_OE_PIN, OUTPUT);
+  digitalWrite(SERVO_OE_PIN, LOW);
 }
 
 void Servo_Control::stop(void)
 {
-  digitalWrite(PIND3, LOW);
+  digitalWrite(ENABLE_RELAY_PIN, LOW);
 }
 
 void Servo_Control::start(void)
 {
-  digitalWrite(PIND3, HIGH);
+  digitalWrite(ENABLE_RELAY_PIN, HIGH);
 }
 
 bool Servo_Control::moveToTargets()
